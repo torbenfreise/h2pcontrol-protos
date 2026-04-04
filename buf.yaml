@@ -1,0 +1,12 @@
+version: v2
+modules:
+  - path: protos
+    name: buf.build/beyer-labs/h2pcontrol
+
+lint:
+  use:
+    - STANDARD
+
+breaking:
+  use:
+    - FILE
