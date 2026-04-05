@@ -2,36 +2,43 @@ syntax = "proto3";
 
 package h2pcontrol.ad45355_dac.v1;
 
-option java_package = "com.beyerlabs.h2pcontrol.ad45355_dac.v1";
-option java_outer_classname = " Ad45355DacProto";
 option java_multiple_files = true;
+option java_outer_classname = "Ad45355DacProto";
+option java_package = "h2pcontrol.ad45355_dac.v1";
 
-
-service Ad45355DAC {
-  rpc SendVoltage (Voltage) returns (VoltageReply) {}
-  rpc SendChannelConfig (ChannelConfig) returns (ChannelConfigReply) {}
-  rpc SendCompleteConfig (Config) returns (ConfigReply) {}
-  rpc StoreConfig(StoreConfigRequest) returns (StoredConfig) {}
-  rpc GetConfig(GetStoredConfigRequest) returns (StoredConfig) {}
+service Ad45355DACService {
+  rpc SendVoltage(SendVoltageRequest) returns (SendVoltageResponse) {}
+  rpc SendChannelConfig(SendChannelConfigRequest) returns (SendChannelConfigResponse) {}
+  rpc SendCompleteConfig(SendCompleteConfigRequest) returns (SendCompleteConfigResponse) {}
+  rpc StoreConfig(StoreConfigRequest) returns (StoreConfigResponse) {}
+  rpc GetConfig(GetConfigRequest) returns (GetConfigResponse) {}
 }
 
 message StoreConfigRequest {
   string name = 1;
 }
 
-message GetStoredConfigRequest {
+message StoreConfigResponse {
+  StoredConfig stored_config = 1;
+}
+
+message GetConfigRequest {
   string uuid = 1;
 }
 
-message Voltage {
+message GetConfigResponse {
+  StoredConfig stored_config = 1;
+}
+
+message SendVoltageRequest {
   double voltage = 1;
 }
 
-message VoltageReply {
+message SendVoltageResponse {
   double wattage = 1;
 }
 
-message ChannelConfig {
+message SendChannelConfigRequest {
   DeflectorChannels pre_stack_deflector_channels = 1;
   Channel stack_einzel_channel = 2;
   DeflectorChannels post_stack_deflector_channels = 3;
@@ -39,12 +46,16 @@ message ChannelConfig {
   QuadrupoleBenderChannels quadrupole_bender_channels = 5;
 }
 
-message ChannelConfigReply {
+message SendChannelConfigResponse {
   bool success = 1;
   string message = 2;
 }
 
-message ConfigReply {
+message SendCompleteConfigRequest {
+  Config config = 1;
+}
+
+message SendCompleteConfigResponse {
   bool success = 1;
   string message = 2;
 }
@@ -62,7 +73,7 @@ message QuadrupoleBenderChannels {
 }
 
 message StoredConfig {
-  int64 timestamp = 1;  // Unix timestamp in milliseconds
+  int64 timestamp = 1; // Unix timestamp in milliseconds
   string name = 2;
   string uuid = 3;
   Config config = 4;
@@ -110,5 +121,5 @@ message Channel {
 }
 
 enum ChannelType {
-  AD45335 = 0;
+  CHANNEL_TYPE_UNSPECIFIED = 0;
 }

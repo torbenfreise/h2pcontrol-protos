@@ -4,24 +4,23 @@ package h2pcontrol.manager.v1;
 
 option java_multiple_files = true;
 option java_outer_classname = "ManagerProto";
-option java_package = "com.beyerlabs.h2pcontrol.manager.v1";
+option java_package = "h2pcontrol.manager.v1";
 
-service Manager {
-  rpc GetStub(StubRequest) returns (StubResponse);
-  rpc RegisterServer(RegisterRequest) returns (RegisterResponse);
-  rpc Heartbeat(stream HeartbeatPing) returns (stream HeartbeatPong);
-
-  rpc FetchServers(Empty) returns (FetchServersResponse);
+service ManagerService {
+  rpc GetStub(GetStubRequest) returns (GetStubResponse);
+  rpc RegisterServer(RegisterServerRequest) returns (RegisterServerResponse);
+  rpc Heartbeat(stream HeartbeatRequest) returns (stream HeartbeatResponse);
+  rpc FetchServers(FetchServersRequest) returns (FetchServersResponse);
   rpc FetchSpecificServer(FetchSpecificServerRequest) returns (FetchSpecificServerResponse);
 }
 
-message Empty {}
+message FetchServersRequest {}
 
-message HeartbeatPing {
+message HeartbeatRequest {
   int64 timestamp = 2;
 }
 
-message HeartbeatPong {
+message HeartbeatResponse {
   bool healthy = 1;
   int64 timestamp = 3;
 }
@@ -33,11 +32,11 @@ message ServerDefinition {
   repeated File proto_files = 4;
 }
 
-message RegisterRequest {
+message RegisterServerRequest {
   ServerDefinition server = 1;
 }
 
-message RegisterResponse {
+message RegisterServerResponse {
   string result = 1;
 }
 
@@ -60,16 +59,16 @@ message FetchSpecificServerResponse {
   string proto = 2;
 }
 
-message StubRequest {
-  string Server_name = 1;
+message GetStubRequest {
+  string server_name = 1;
   string version = 2;
   string language = 3; // e.g., "python", "java"
 }
 
-message StubResponse {
+message GetStubResponse {
   string name = 1;
   bytes zip_data = 2;
-  string checksum = 3; // Optional checksum (e.g., SHA256)
+  string checksum = 3; // SHA256
 }
 
 message File {
