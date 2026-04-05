@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package h2pcontrol.lioptec.v1;
+
+option java_multiple_files = true;
+option java_outer_classname = "LioptecProto";
+option java_package = "com.beyerlabs.h2pcontrol.lioptec.v1";
+
+service LioptecService {
+  rpc Connect(LaserRequest) returns (IsOk);
+  rpc SetWavelength(WavelengthRequest) returns (IsOk);
+  rpc IsReady(Empty) returns (IsOk);
+  rpc Disconnect(Empty) returns (IsOk);
+}
+
+message Empty {}
+
+message LaserRequest {
+  string ip = 1;
+  int32 port = 2;
+}
+
+message WavelengthRequest {
+  float wavelength = 1;
+}
+
+message IsOk {
+  bool ok = 1;
+  string status = 2;
+}
