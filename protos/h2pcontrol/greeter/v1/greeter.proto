@@ -2,11 +2,11 @@ syntax = "proto3";
 
 package h2pcontrol.greeter.v1;
 
+option java_outer_classname = "GreeterService";
 option java_package = "h2pcontrol.greeter.v1";
-option java_outer_classname = "GreeterProto";
 
-service Greeter {
-  rpc SayHello (SayHelloRequest) returns (SayHelloResponse);
+service GreeterService {
+  rpc SayHello(SayHelloRequest) returns (SayHelloResponse);
 }
 
 message SayHelloRequest {
