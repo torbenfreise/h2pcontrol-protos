@@ -3,7 +3,7 @@ syntax = "proto3";
 package h2pcontrol.registry.v1;
 
 option java_multiple_files = true;
-option java_outer_classname = "RegistryProto";
+option java_outer_classname = "RegistryServiceProto";
 option java_package = "com.beyerlabs.h2pcontrol.registry.v1";
 
 service RegistryService {

@@ -3,7 +3,7 @@ syntax = "proto3";
 package h2pcontrol.ad45355_dac.v1;
 
 option java_multiple_files = true;
-option java_outer_classname = "Ad45355DacProto";
+option java_outer_classname = "Ad45355DacServiceProto";
 option java_package = "h2pcontrol.ad45355_dac.v1";
 
 service Ad45355DACService {
