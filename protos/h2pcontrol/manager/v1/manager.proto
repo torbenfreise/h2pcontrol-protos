@@ -7,11 +7,9 @@ option java_outer_classname = "ManagerProto";
 option java_package = "h2pcontrol.manager.v1";
 
 service ManagerService {
-  rpc GetStub(GetStubRequest) returns (GetStubResponse);
   rpc RegisterServer(RegisterServerRequest) returns (RegisterServerResponse);
   rpc Heartbeat(stream HeartbeatRequest) returns (stream HeartbeatResponse);
   rpc FetchServers(FetchServersRequest) returns (FetchServersResponse);
-  rpc FetchSpecificServer(FetchSpecificServerRequest) returns (FetchSpecificServerResponse);
 }
 
 message FetchServersRequest {}
@@ -27,9 +25,8 @@ message HeartbeatResponse {
 
 message ServerDefinition {
   string server_name = 1;
+  string description = 3;
   string port = 2;
-  string version = 3;
-  repeated File proto_files = 4;
 }
 
 message RegisterServerRequest {
@@ -48,30 +45,4 @@ message FetchServerDefinition {
 
 message FetchServersResponse {
   repeated FetchServerDefinition servers = 1;
-}
-
-message FetchSpecificServerRequest {
-  string addr = 1;
-}
-
-message FetchSpecificServerResponse {
-  FetchServerDefinition server_definition = 1;
-  string proto = 2;
-}
-
-message GetStubRequest {
-  string server_name = 1;
-  string version = 2;
-  string language = 3; // e.g., "python", "java"
-}
-
-message GetStubResponse {
-  string name = 1;
-  bytes zip_data = 2;
-  string checksum = 3; // SHA256
-}
-
-message File {
-  string name = 1;
-  bytes content = 2;
 }
