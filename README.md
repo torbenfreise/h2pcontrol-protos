@@ -9,7 +9,8 @@ Schemas are published to the [Buf Schema Registry](https://buf.build/beyer-labs/
 ## Adding a new device
 
 1. Create `protos/h2pcontrol/<device>/v1/<service>.proto`
-2. Copy the following template, replacing 'device' with your device name: 
+2. Copy the following template, replacing 'device' with your device name:
+
 ```protobuf
 syntax = "proto3";
 
@@ -19,7 +20,8 @@ option java_multiple_files = true;
 option java_outer_classname = "DeviceProto";
 option java_package = "com.beyerlabs.h2pcontrol.device.v1";
 ```
-3. Open a new PR with your changes.The workflow will automatically run linting and formatting checks. 
+
+3. Open a new PR with your changes. The workflow will automatically run linting and formatting checks.
 4. Once the checks have passed, you can merge to main, and the schemas and SDKs will be available in the registry.
 
 
