@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package h2pcontrol.manager.v1;
 
+import "google/protobuf/timestamp.proto";
+
 option java_multiple_files = true;
 option java_outer_classname = "ManagerServiceProto";
 option java_package = "com.beyerlabs.h2pcontrol.manager.v1";
@@ -15,14 +17,14 @@ service ManagerService {
 message ServiceDefinition {
   string name = 1;
   string description = 2;
-  string port = 3;
+  uint32 port = 3;
 }
 
 message ServiceInfo {
-  string name = 1;
-  string description = 2;
-  string addr = 3;
-  bool status = 4;
+  ServiceDefinition definition = 1;
+  string host = 2;
+  bool healthy = 4;
+  google.protobuf.Timestamp last_seen = 5;
 }
 
 message RegisterRequest {
