@@ -1,0 +1,54 @@
+syntax = "proto3";
+package h2pcontrol.mccdaq.v1;
+
+// ─────────────────────────────────────────
+// Analog Input
+// ─────────────────────────────────────────
+
+message AnalogSample {
+  int32 channel = 1;
+  double volts = 2;
+  int32 raw = 3;
+  int64 timestamp_us = 4;
+}
+
+message AnalogReadRequest {
+  int32 channel = 1;
+}
+
+message AnalogStreamRequest {
+  repeated int32 channels = 1;
+  double rate_hz = 2;
+}
+
+// ─────────────────────────────────────────
+// Analog Output
+// ─────────────────────────────────────────
+
+message AnalogReadResponse {
+  AnalogSample sample = 1;
+}
+
+message AnalogStreamResponse {
+  AnalogSample sample = 1;
+}
+
+message AnalogWriteRequest {
+  int32 channel = 1;
+  double volts = 2;
+}
+
+message AnalogWriteResponse {}
+
+// ─────────────────────────────────────────
+// Service
+// ─────────────────────────────────────────
+
+service MccDaqService {
+  // Analog input
+  rpc AnalogRead(AnalogReadRequest) returns (AnalogReadResponse);
+  rpc AnalogStream(AnalogStreamRequest) returns (stream AnalogStreamResponse);
+
+  // Analog output
+  rpc AnalogWrite(AnalogWriteRequest) returns (AnalogWriteResponse);
+}
