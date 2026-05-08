@@ -17,14 +17,14 @@ service ManagerService {
 message ServiceDefinition {
   string name = 1;
   string description = 2;
-  uint32 port = 3;
+  string host = 3;
+  uint32 port = 4;
 }
 
 message ServiceInfo {
   ServiceDefinition definition = 1;
-  string host = 2;
-  bool healthy = 4;
-  google.protobuf.Timestamp last_seen = 5;
+  bool healthy = 2;
+  google.protobuf.Timestamp last_seen = 3;
 }
 
 message RegisterRequest {
