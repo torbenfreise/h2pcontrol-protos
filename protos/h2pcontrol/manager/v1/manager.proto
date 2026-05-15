@@ -12,6 +12,7 @@ service ManagerService {
   rpc Register(RegisterRequest) returns (RegisterResponse);
   rpc Heartbeat(stream HeartbeatRequest) returns (stream HeartbeatResponse);
   rpc List(ListRequest) returns (ListResponse);
+  rpc Watch(WatchRequest) returns (stream WatchResponse);
 }
 
 message ServiceDefinition {
@@ -35,6 +36,12 @@ message RegisterResponse {}
 message ListRequest {}
 
 message ListResponse {
+  repeated ServiceInfo services = 1;
+}
+
+message WatchRequest {}
+
+message WatchResponse {
   repeated ServiceInfo services = 1;
 }
 
