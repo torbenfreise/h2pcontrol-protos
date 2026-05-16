@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package h2pcontrol.central_daq.v1;
+
+option java_multiple_files = true;
+option java_outer_classname = "CentralDAQServiceProto";
+option java_package = "com.beyerlabs.h2pcontrol.central_daq.v1";
+
+message DAQEvent {
+  int64 event_id = 1;
+  string timestamp = 2;
+  string run_id = 3;
+  string producer_id = 4;
+  string source = 5;
+  string method = 6;
+  string direction = 7;
+  string data = 8;
+}
+
+message StreamSummary {
+  int64 received = 1;
+  string message = 2;
+}
+
+service CentralDAQ {
+  rpc StreamEvents(stream DAQEvent) returns (StreamSummary);
+}
