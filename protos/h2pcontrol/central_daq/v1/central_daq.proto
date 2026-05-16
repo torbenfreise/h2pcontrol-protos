@@ -6,7 +6,7 @@ option java_multiple_files = true;
 option java_outer_classname = "CentralDAQServiceProto";
 option java_package = "com.beyerlabs.h2pcontrol.central_daq.v1";
 
-message DAQEvent {
+message StreamDAQEventsRequest {
   int64 event_id = 1;
   string timestamp = 2;
   string run_id = 3;
@@ -17,11 +17,11 @@ message DAQEvent {
   string data = 8;
 }
 
-message StreamSummary {
+message StreamDAQEventsResponse {
   int64 received = 1;
   string message = 2;
 }
 
-service CentralDAQ {
-  rpc StreamEvents(stream DAQEvent) returns (StreamSummary);
+service CentralDAQService {
+  rpc StreamDAQEvents(stream StreamDAQEventsRequest) returns (StreamDAQEventsResponse);
 }
