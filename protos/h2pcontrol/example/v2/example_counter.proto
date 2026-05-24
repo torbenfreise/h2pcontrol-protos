@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package h2pcontrol.example.v2;
+
+import "google/protobuf/timestamp.proto";
+
+service CounterService {
+  rpc Read(ReadRequest) returns (ReadResponse);
+
+  rpc Write(WriteRequest) returns (WriteResponse);
+
+  rpc SetRate(SetRateRequest) returns (SetRateResponse);
+
+  rpc Stream(StreamRequest) returns (stream StreamResponse);
+}
+
+message CounterState {
+  int64 value = 1;
+  double rate_per_second = 3;
+  uint64 version = 4;
+  bool running = 5;
+  google.protobuf.Timestamp observed_at = 6;
+}
+
+message ReadRequest {
+  uint64 min_version = 1;
+}
+
+message ReadResponse {
+  CounterState state = 1;
+}
+
+message WriteRequest {
+  int64 value = 1;
+}
+
+message WriteResponse {
+  CounterState state = 1;
+}
+
+message SetRateRequest {
+  double rate_per_second = 1;
+}
+
+message SetRateResponse {
+  CounterState state = 1;
+}
+
+message StreamRequest {
+  double interval_seconds = 1;
+  bool emit_on_change_only = 2;
+}
+
+message StreamResponse {
+  CounterState state = 1;
+}
