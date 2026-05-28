@@ -64,5 +64,6 @@ message LogRequest {
   string service_name = 1;
   Level level = 2;
   string message = 3;
+  google.protobuf.Timestamp timestamp = 4;
 }
 message LogResponse {}
