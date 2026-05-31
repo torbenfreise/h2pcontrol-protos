@@ -1,0 +1,133 @@
+syntax = "proto3";
+
+package h2pcontrol.pulseblaster.v1;
+
+option java_multiple_files = true;
+option java_outer_classname = "PulseBlasterServiceProto";
+option java_package = "com.beyerlabs.h2pcontrol.pulseblaster.v1";
+
+/** PulseBlaster instruction opcodes. */
+enum OpCode {
+  OP_CODE_UNSPECIFIED = 0;
+  // Continue to the next instruction.
+  OP_CODE_CONTINUE = 1;
+  // Stop execution.
+  OP_CODE_STOP = 2;
+  // Begin a loop. inst_data specifies the loop count.
+  OP_CODE_LOOP = 3;
+  // End of a loop body. inst_data specifies the loop start instruction index.
+  OP_CODE_END_LOOP = 4;
+  // Jump to subroutine. inst_data specifies the target instruction index.
+  OP_CODE_JSR = 5;
+  // Return from subroutine.
+  OP_CODE_RTS = 6;
+  // Unconditional branch. inst_data specifies the target instruction index.
+  OP_CODE_BRANCH = 7;
+  // Long delay. inst_data specifies the delay multiplier.
+  OP_CODE_LONG_DELAY = 8;
+  // Wait for a hardware trigger.
+  OP_CODE_WAIT = 9;
+}
+
+/** An output level and duration pair, used in ChannelSequence */
+message Pulse {
+  bool high = 1;
+  uint64 duration_ns = 2;
+}
+
+/** A sequence of pulses for a single output channel. */
+message ChannelSequence {
+  uint32 channel = 1;
+  repeated Pulse pulses = 2;
+}
+
+/**
+ * A collection of Channel Sequences used to program one or more output channels.
+ * The server compiles these into Instructions.
+ */
+message ChannelProgram {
+  repeated ChannelSequence patterns = 1;
+}
+
+/** A single PulseBlaster hardware instruction. */
+message Instruction {
+  // determines state of each TTL output bit.
+  uint32 flags = 1;
+  // determines which type of instruction is to be executed
+  OpCode op_code = 2;
+  // data to be used with the previous 'op_code' field
+  uint32 inst_data = 3;
+  // duration of the pulse program instruction, specified in ns
+  uint64 duration_ns = 4;
+}
+
+/** Program defined as an ordered list of hardware instructions. */
+message InstructionProgram {
+  repeated Instruction instructions = 1;
+}
+
+/** Information about the connected PulseBlaster board. */
+message BoardInfo {
+  string board_type = 1;
+  double clock_frequency_mhz = 2;
+  uint32 num_channels = 3;
+}
+
+/** Current execution status of the board. */
+enum BoardStatus {
+  BOARD_STATUS_UNSPECIFIED = 0;
+  BOARD_STATUS_STOPPED = 1;
+  BOARD_STATUS_RESET = 2;
+  BOARD_STATUS_RUNNING = 4;
+  BOARD_STATUS_WAITING = 8;
+}
+
+message GetBoardInfoRequest {}
+
+message GetBoardInfoResponse {
+  BoardInfo board_info = 1;
+}
+
+message GetStatusRequest {}
+
+message GetStatusResponse {
+  BoardStatus status = 1;
+}
+
+/** Program the board with either Channel Sequences or Instructions.*/
+message ProgramRequest {
+  oneof program {
+    ChannelProgram channels = 1;
+    InstructionProgram instructions = 2;
+  }
+}
+
+message ProgramResponse {}
+
+message StartRequest {}
+
+message StartResponse {}
+
+message StopRequest {}
+
+message StopResponse {}
+
+message ResetRequest {}
+
+message ResetResponse {}
+
+/** Service for programming a SpinCore PulseBlaster board. */
+service PulseBlasterService {
+  // Returns information about the connected board.
+  rpc GetBoardInfo(GetBoardInfoRequest) returns (GetBoardInfoResponse);
+  // Returns the current execution status.
+  rpc GetStatus(GetStatusRequest) returns (GetStatusResponse);
+  // Uploads a program to the board.
+  rpc Program(ProgramRequest) returns (ProgramResponse);
+  // Starts program execution.
+  rpc Start(StartRequest) returns (StartResponse);
+  // Stops program execution.
+  rpc Stop(StopRequest) returns (StopResponse);
+  // Resets the board.
+  rpc Reset(ResetRequest) returns (ResetResponse);
+}
