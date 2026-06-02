@@ -46,7 +46,7 @@ message ChannelSequence {
  * The server compiles these into Instructions.
  */
 message ChannelProgram {
-  repeated ChannelSequence patterns = 1;
+  repeated ChannelSequence sequences = 1;
 }
 
 /** A single PulseBlaster hardware instruction. */
@@ -68,7 +68,7 @@ message InstructionProgram {
 
 /** Information about the connected PulseBlaster board. */
 message BoardInfo {
-  string board_type = 1;
+  uint32 firmware_id = 1;
   double clock_frequency_mhz = 2;
   uint32 num_channels = 3;
 }
@@ -78,8 +78,8 @@ enum BoardStatus {
   BOARD_STATUS_UNSPECIFIED = 0;
   BOARD_STATUS_STOPPED = 1;
   BOARD_STATUS_RESET = 2;
-  BOARD_STATUS_RUNNING = 4;
-  BOARD_STATUS_WAITING = 8;
+  BOARD_STATUS_RUNNING = 3;
+  BOARD_STATUS_WAITING = 4;
 }
 
 message GetBoardInfoRequest {}
