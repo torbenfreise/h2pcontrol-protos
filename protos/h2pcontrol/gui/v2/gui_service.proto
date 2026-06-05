@@ -1,14 +1,12 @@
 syntax = "proto3";
 
-package h2pcontrol.gui.v1;
+package h2pcontrol.gui.v2;
 
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 
 service GuiService {
   rpc GetInfo(GetInfoRequest) returns (GetInfoResponse);
-  rpc Start(StartRequest) returns (StartResponse);
-  rpc Stop(StopRequest) returns (StopResponse);
   rpc GetLatest(GetLatestRequest) returns (GetLatestResponse);
   rpc StreamFrames(StreamFramesRequest) returns (stream StreamFramesResponse);
   rpc SaveInterval(SaveIntervalRequest) returns (SaveIntervalResponse);
@@ -96,16 +94,6 @@ message GetInfoResponse {
   string service_name = 3;
   repeated string sources = 4;
   google.protobuf.Struct metadata = 6;
-}
-
-message StartRequest {}
-message StartResponse {
-  bool running = 1;
-}
-
-message StopRequest {}
-message StopResponse {
-  bool running = 1;
 }
 
 message GetLatestRequest {
