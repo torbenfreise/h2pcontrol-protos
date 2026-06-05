@@ -1,0 +1,142 @@
+syntax = "proto3";
+
+package h2pcontrol.gui.v2;
+
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+
+service GuiService {
+  rpc GetInfo(GetInfoRequest) returns (GetInfoResponse);
+  rpc GetLatest(GetLatestRequest) returns (GetLatestResponse);
+  rpc StreamFrames(StreamFramesRequest) returns (stream StreamFramesResponse);
+  rpc SaveInterval(SaveIntervalRequest) returns (SaveIntervalResponse);
+}
+
+// Enums
+enum FrameKind {
+  FRAME_KIND_UNSPECIFIED = 0;
+  FRAME_KIND_SCALAR = 1;
+  FRAME_KIND_VECTOR = 2;
+  FRAME_KIND_WAVEFORM = 3;
+  FRAME_KIND_SCAN_POINT = 4;
+  FRAME_KIND_TABLE = 5;
+}
+
+enum ArrayEncoding {
+  ARRAY_ENCODING_UNSPECIFIED = 0;
+  ARRAY_ENCODING_RAW_F64_LE = 1;
+  ARRAY_ENCODING_RAW_F32_LE = 2;
+  ARRAY_ENCODING_NPY = 3;
+  ARRAY_ENCODING_NPZ = 4;
+}
+
+// Axis and Channel definitions
+message Axis {
+  string name = 1;
+  string unit = 2;
+  repeated double values = 3;
+}
+
+message Channel {
+  string name = 1;
+  string unit = 2;
+  google.protobuf.Struct metadata = 3;
+}
+
+// Payloads for different frame kinds
+message ScalarPayload {
+  double value = 1;
+  string unit = 2;
+}
+
+message VectorPayload {
+  repeated double values = 1;
+  repeated string units = 2;
+  repeated string names = 3;
+}
+
+message ArrayPayload {
+  bytes data = 1;
+  repeated int64 shape = 2;
+  string dtype = 3;
+  ArrayEncoding encoding = 4;
+}
+
+message FramePayload {
+  oneof payload {
+    ScalarPayload scalar = 1;
+    VectorPayload vector = 2;
+    ArrayPayload array = 3;
+    google.protobuf.Struct struct_value = 4;
+  }
+}
+
+// Main message -> Frame
+message Frame {
+  string source = 1;
+  string producer_id = 2;
+  uint64 sequence_id = 3;
+  google.protobuf.Timestamp observed_at = 4;
+
+  FrameKind kind = 5;
+  repeated Axis axes = 6;
+  repeated Channel channels = 7;
+  FramePayload payload = 8;
+
+  google.protobuf.Struct metadata = 9;
+}
+
+// Service GRPC messages
+message GetInfoRequest {}
+message GetInfoResponse {
+  string instrument_id = 1;
+  string display_name = 2;
+  string service_name = 3;
+  repeated string sources = 4;
+  google.protobuf.Struct metadata = 6;
+}
+
+message GetLatestRequest {
+  string source = 1;
+  uint64 min_sequence_id = 2;
+}
+
+message GetLatestResponse {
+  Frame frame = 1;
+  bool has_frame = 2;
+}
+
+message StreamFramesRequest {
+  string source = 1;
+  double interval_seconds = 2;
+  bool emit_on_change_only = 3;
+}
+
+message StreamFramesResponse {
+  Frame frame = 1;
+}
+
+message SaveIntervalRequest {
+  string source = 1;
+  google.protobuf.Timestamp start_observed_at = 2;
+  google.protobuf.Timestamp end_observed_at = 3;
+  uint64 start_sequence_id = 4;
+  uint64 end_sequence_id = 5;
+  string method = 6;
+  google.protobuf.Struct analysis = 7;
+  google.protobuf.Struct user_metadata = 8;
+  google.protobuf.Struct tags = 9;
+}
+
+message SavedFrame {
+  int64 event_id = 1;
+  uint64 sequence_id = 2;
+  google.protobuf.Timestamp observed_at = 3;
+}
+
+message SaveIntervalResponse {
+  repeated SavedFrame frames = 1;
+  uint32 saved_count = 2;
+  uint64 first_sequence_id = 3;
+  uint64 last_sequence_id = 4;
+}
