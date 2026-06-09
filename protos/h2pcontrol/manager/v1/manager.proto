@@ -65,5 +65,6 @@ message LogRequest {
   Level level = 2;
   string message = 3;
   google.protobuf.Timestamp timestamp = 4;
+  map<string, string> attrs = 5;
 }
 message LogResponse {}
