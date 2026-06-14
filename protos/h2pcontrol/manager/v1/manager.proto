@@ -89,7 +89,10 @@ message LogRequest {
 
 message LogResponse {}
 
-message StreamLogsRequest {}
+message StreamLogsRequest {
+  bool follow = 1;
+  optional int64 tail = 2;
+}
 
 message StreamLogsResponse {
   LogEntry entry = 1;
