@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package h2pcontrol.bme280_thpa.v1;
+
+option java_multiple_files = true;
+option java_outer_classname = "DeviceProto";
+option java_package = "com.beyerlabs.h2pcontrol.device.v1";
+
+service Bme280Service {
+  rpc Read(ReadRequest) returns (ReadResponse);
+  rpc Stream(StreamRequest) returns (stream StreamResponse);
+  rpc StartReading(StartReadingRequest) returns (StartReadingResponse);
+  rpc StopReading(StopReadingRequest) returns (StopReadingResponse);
+  rpc GetStatus(GetStatusRequest) returns (GetStatusResponse);
+}
+
+message ReadRequest {}
+
+message StartReadingRequest {}
+
+message StopReadingRequest {}
+
+message GetStatusRequest {}
+
+message StreamResponse {
+  double temperature_c = 1;
+  double pressure_hpa = 2;
+  double altitude_meters = 3;
+  double humidity_percent = 4;
+  string port = 5;
+}
+
+message ReadResponse {
+  double temperature_c = 1;
+  double pressure_hpa = 2;
+  double altitude_meters = 3;
+  double humidity_percent = 4;
+  string port = 5;
+}
+
+message StreamRequest {
+  double interval_seconds = 1;
+}
+
+message GetStatusResponse {
+  bool is_reading = 1;
+  string port = 2;
+}
+
+message StartReadingResponse {
+  bool is_reading = 1;
+  string port = 2;
+}
+
+message StopReadingResponse {
+  bool is_reading = 1;
+  string port = 2;
+}
