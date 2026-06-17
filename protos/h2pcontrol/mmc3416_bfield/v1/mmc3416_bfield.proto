@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+package h2pcontrol.mmc3416_bfield.v1;
+
+option java_multiple_files = true;
+option java_package = "io.h2pcontrol.mmc3416_bfield.v1";
+option java_outer_classname = "Mmc3416BFieldProto";
+
+// gRPC interface for the MMC3416 magnetic-field board.
+//
+// Implementation is a serial bridge around the
+// existing SCPI firmware:
+//   *IDN?               -> GetInfo
+//   DISPlay:ALL?        -> GetStatus
+//   MEASure:FIELD?      -> MeasureField
+//   CALibrate:OFFSet?   -> CalibrateOffset
+service Mmc3416BFieldService {
+  rpc GetInfo(GetInfoRequest) returns (GetInfoResponse);
+  rpc GetStatus(GetStatusRequest) returns (GetStatusResponse);
+  rpc MeasureField(MeasureFieldRequest) returns (MeasureFieldResponse);
+  rpc CalibrateOffset(CalibrateOffsetRequest) returns (CalibrateOffsetResponse);
+}
+
+message GetInfoRequest {}
+
+message GetInfoResponse {
+  string manufacturer = 1;
+  string model = 2;
+  string serial_number = 3;
+  string firmware_version = 4;
+  string raw_idn = 5;
+}
+
+message GetStatusRequest {}
+
+message GetStatusResponse {
+  bool serial_connected = 1;
+  bool sensor_detected = 2;
+  string port = 3;
+  string message = 4;
+}
+
+message MeasureFieldRequest {}
+
+message MeasureFieldResponse {
+  MagneticField field = 1;
+  string raw_response = 2;
+}
+
+message CalibrateOffsetRequest {}
+
+message CalibrateOffsetResponse {
+  MagneticField offset = 1;
+  string raw_response = 2;
+}
+
+message MagneticField {
+  double x_gauss = 1;
+  double y_gauss = 2;
+  double z_gauss = 3;
+}
