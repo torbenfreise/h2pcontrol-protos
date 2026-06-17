@@ -3,8 +3,8 @@ syntax = "proto3";
 package h2pcontrol.mmc3416_bfield.v1;
 
 option java_multiple_files = true;
-option java_package = "io.h2pcontrol.mmc3416_bfield.v1";
 option java_outer_classname = "Mmc3416BFieldProto";
+option java_package = "io.h2pcontrol.mmc3416_bfield.v1";
 
 // gRPC interface for the MMC3416 magnetic-field board.
 //
