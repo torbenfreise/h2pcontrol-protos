@@ -92,6 +92,7 @@ message LogResponse {}
 message StreamLogsRequest {
   bool follow = 1;
   optional int64 tail = 2;
+  optional Level min_level = 3;
 }
 
 message StreamLogsResponse {
