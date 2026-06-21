@@ -7,12 +7,12 @@ option java_outer_classname = "GoNogoServiceProto";
 option java_package = "com.beyerlabs.h2pcontrol.gonogo.v1";
 
 service GoNogoService {
-  rpc StreamReady(StreamReadyRequest) returns (stream StreamReadyResponse);
+  rpc GetReady(GetReadyRequest) returns (GetReadyResponse);
 }
 
-message StreamReadyRequest {}
+message GetReadyRequest {}
 
-message StreamReadyResponse {
+message GetReadyResponse {
   bool ready = 1;
-  string reason = 2; // optionally give a reason why this service is not ready
+  string reason = 2; // Optionally give a reason why the service isn't ready.
 }
