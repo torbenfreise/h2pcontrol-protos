@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package h2pcontrol.gonogo.v1;
+
+option java_multiple_files = true;
+option java_outer_classname = "GoNogoServiceProto";
+option java_package = "com.beyerlabs.h2pcontrol.gonogo.v1";
+
+service GoNogoService {
+  rpc StreamReady(StreamReadyRequest) returns (stream StreamReadyResponse);
+}
+
+message StreamReadyRequest {}
+
+message StreamReadyResponse {
+  bool ready = 1;
+  string reason = 2; // optionally give a reason why this service is not ready
+}
