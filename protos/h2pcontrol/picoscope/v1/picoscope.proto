@@ -85,7 +85,6 @@ message ConfigureResolutionRequest {
 
 message ConfigureResolutionResponse {}
 
-// Request a single trace. This arms the trigger and returns as soon as the trace is acquired.
 message GetTraceRequest {}
 
 message GetTraceResponse {
@@ -95,10 +94,6 @@ message GetTraceResponse {
   google.protobuf.Timestamp trigger_timestamp = 2;
 }
 
-//  Start a triggered acquisition loop.
-//  The server arms the scope, waits for each trigger, reads out the
-//  trace, and streams it back. The stream continues until the client
-//  cancels or max_captures is reached.
 message StreamTracesRequest {
   // Maximum number of triggered captures to return, 0 = unlimited.
   int32 max_captures = 1;
@@ -155,18 +150,26 @@ message TimebaseInfo {
 }
 
 service PicoscopeService {
-  // Configuration
+  // Set the coupling, voltage range, and offset for a single channel.
   rpc ConfigureChannel(ConfigureChannelRequest) returns (ConfigureChannelResponse);
+  // Set the trigger source, direction, threshold, and holdoff.
   rpc ConfigureTrigger(ConfigureTriggerRequest) returns (ConfigureTriggerResponse);
+  // Set the timebase index and pre/post-trigger sample counts.
   rpc ConfigureTimebase(ConfigureTimebaseRequest) returns (ConfigureTimebaseResponse);
+  // Set the ADC resolution in bits.
   rpc ConfigureResolution(ConfigureResolutionRequest) returns (ConfigureResolutionResponse);
 
-  // Acquisition
+  // Arm the trigger and return a single trace once acquired.
   rpc GetTrace(GetTraceRequest) returns (GetTraceResponse);
+  // Start a triggered acquisition loop. The server arms the scope, waits
+  // for each trigger, reads out the trace, and streams it back. The stream
+  // continues until the client cancels or max_captures is reached.
   rpc StreamTraces(StreamTracesRequest) returns (stream StreamTracesResponse);
 
-  // Utilities
+  // List the voltage ranges supported by the device.
   rpc GetVoltageRanges(GetVoltageRangesRequest) returns (GetVoltageRangesResponse);
+  // List the ADC resolutions supported by the device.
   rpc GetResolutions(GetResolutionsRequest) returns (GetResolutionsResponse);
+  // List available timebases and their sample intervals.
   rpc GetTimebases(GetTimebasesRequest) returns (GetTimebasesResponse);
 }
