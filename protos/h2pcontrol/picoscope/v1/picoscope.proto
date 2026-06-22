@@ -15,6 +15,32 @@ enum Coupling {
   COUPLING_AC = 2;
 }
 
+// voltage range (±V) for an analog input channel.
+enum VoltageRange {
+  VOLTAGE_RANGE_UNSPECIFIED = 0;
+  VOLTAGE_RANGE_10_MV = 1;
+  VOLTAGE_RANGE_20_MV = 2;
+  VOLTAGE_RANGE_50_MV = 3;
+  VOLTAGE_RANGE_100_MV = 4;
+  VOLTAGE_RANGE_200_MV = 5;
+  VOLTAGE_RANGE_500_MV = 6;
+  VOLTAGE_RANGE_1_V = 7;
+  VOLTAGE_RANGE_2_V = 8;
+  VOLTAGE_RANGE_5_V = 9;
+  VOLTAGE_RANGE_10_V = 10;
+  VOLTAGE_RANGE_20_V = 11;
+}
+
+// ADC resolution.
+enum Resolution {
+  RESOLUTION_UNSPECIFIED = 0;
+  RESOLUTION_8_BIT = 1;
+  RESOLUTION_12_BIT = 2;
+  RESOLUTION_14_BIT = 3;
+  RESOLUTION_15_BIT = 4;
+  RESOLUTION_16_BIT = 5;
+}
+
 // Trigger edge / direction.
 enum TriggerDirection {
   TRIGGER_DIRECTION_UNSPECIFIED = 0;
@@ -31,9 +57,7 @@ message ChannelConfig {
   // Whether this channel is active for acquisition.
   bool enabled = 2;
   Coupling coupling = 3;
-  // Voltage range in volts (e.g. 1.0 for ±1 V).
-  // Must match a range supported by the device; query GetVoltageRanges.
-  float voltage_range_volts = 4;
+  VoltageRange voltage_range = 4;
   // Offset of the center of the voltage range from 0 V.
   float analog_offset_volts = 5;
 }
@@ -78,9 +102,7 @@ message ConfigureTimebaseResponse {
 }
 
 message ConfigureResolutionRequest {
-  // ADC resolution in bits (e.g. 8, 12, 14, 15, 16).
-  // Must match a resolution supported by the device (query GetResolutions).
-  int32 resolution_bits = 1;
+  Resolution resolution = 1;
 }
 
 message ConfigureResolutionResponse {}
@@ -122,20 +144,6 @@ message ChannelTrace {
   bool overflow = 5;
 }
 
-message GetVoltageRangesRequest {}
-
-message GetVoltageRangesResponse {
-  // Valid ± full-scale voltage ranges in volts.
-  repeated float ranges_volts = 1;
-}
-
-message GetResolutionsRequest {}
-
-message GetResolutionsResponse {
-  // Valid ADC resolutions in bits.
-  repeated int32 resolutions_bits = 1;
-}
-
 message GetTimebasesRequest {}
 
 message GetTimebasesResponse {
@@ -166,10 +174,6 @@ service PicoscopeService {
   // continues until the client cancels or max_captures is reached.
   rpc StreamTraces(StreamTracesRequest) returns (stream StreamTracesResponse);
 
-  // List the voltage ranges supported by the device.
-  rpc GetVoltageRanges(GetVoltageRangesRequest) returns (GetVoltageRangesResponse);
-  // List the ADC resolutions supported by the device.
-  rpc GetResolutions(GetResolutionsRequest) returns (GetResolutionsResponse);
   // List available timebases and their sample intervals.
   rpc GetTimebases(GetTimebasesRequest) returns (GetTimebasesResponse);
 }
