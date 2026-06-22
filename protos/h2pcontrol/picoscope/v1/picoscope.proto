@@ -1,0 +1,172 @@
+syntax = "proto3";
+
+package h2pcontrol.picoscope.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option java_multiple_files = true;
+option java_outer_classname = "PicoscopeServiceProto";
+option java_package = "com.beyerlabs.h2pcontrol.picoscope.v1";
+
+// Coupling mode for an analog input channel.
+enum Coupling {
+  COUPLING_UNSPECIFIED = 0;
+  COUPLING_DC = 1;
+  COUPLING_AC = 2;
+}
+
+// Trigger edge / direction.
+enum TriggerDirection {
+  TRIGGER_DIRECTION_UNSPECIFIED = 0;
+  TRIGGER_DIRECTION_RISING = 1;
+  TRIGGER_DIRECTION_FALLING = 2;
+  TRIGGER_DIRECTION_RISING_OR_FALLING = 3;
+  TRIGGER_DIRECTION_ABOVE = 4;
+  TRIGGER_DIRECTION_BELOW = 5;
+}
+
+message ChannelConfig {
+  // 0 = channel A, 1 = channel B, …
+  int32 channel_index = 1;
+  // Whether this channel is active for acquisition.
+  bool enabled = 2;
+  Coupling coupling = 3;
+  // Voltage range in volts (e.g. 1.0 for ±1 V).
+  // Must match a range supported by the device; query GetVoltageRanges.
+  float voltage_range_volts = 4;
+  // Offset of the center of the voltage range from 0 V.
+  float analog_offset_volts = 5;
+}
+
+message ConfigureChannelRequest {
+  ChannelConfig channel = 1;
+}
+
+message ConfigureChannelResponse {}
+
+message TriggerConfig {
+  // 0 for channel A, 1 for channel B, etc.
+  int32 channel_index = 1;
+  // Edge or level condition that fires the trigger.
+  TriggerDirection direction = 2;
+  // Voltage threshold for the trigger condition.
+  float threshold_volts = 3;
+  // Holdoff after a trigger before re-arming, in nanoseconds.
+  int64 holdoff_ns = 4;
+}
+
+message ConfigureTriggerRequest {
+  TriggerConfig trigger = 1;
+}
+
+message ConfigureTriggerResponse {}
+
+message ConfigureTimebaseRequest {
+  // PicoScope timebase index.
+  int32 timebase_index = 1;
+  // Number of samples to capture before the trigger point.
+  int32 num_samples_pre_trigger = 2;
+  // Number of samples to capture after the trigger point.
+  int32 num_samples_post_trigger = 3;
+}
+
+message ConfigureTimebaseResponse {
+  // PicoScope timebase index.
+  int32 timebase_index = 1;
+  // Resulting sample interval in nanoseconds for this timebase.
+  int32 sample_interval_ns = 2;
+}
+
+message ConfigureResolutionRequest {
+  // ADC resolution in bits (e.g. 8, 12, 14, 15, 16).
+  // Must match a resolution supported by the device (query GetResolutions).
+  int32 resolution_bits = 1;
+}
+
+message ConfigureResolutionResponse {}
+
+// Request a single trace. This arms the trigger and returns as soon as the trace is acquired.
+message GetTraceRequest {}
+
+message GetTraceResponse {
+  // One trace per enabled channel.
+  repeated ChannelTrace traces = 1;
+  // time when the trigger fired.
+  google.protobuf.Timestamp trigger_timestamp = 2;
+}
+
+//  Start a triggered acquisition loop.
+//  The server arms the scope, waits for each trigger, reads out the
+//  trace, and streams it back. The stream continues until the client
+//  cancels or max_captures is reached.
+message StreamTracesRequest {
+  // Maximum number of triggered captures to return, 0 = unlimited.
+  int32 max_captures = 1;
+}
+
+message StreamTracesResponse {
+  // Monotonically increasing capture index (starting at 0).
+  int32 capture_index = 1;
+  // One entry per enabled channel.
+  repeated ChannelTrace traces = 2;
+  // time when the trigger fired.
+  google.protobuf.Timestamp trigger_timestamp = 3;
+}
+
+// Trace data
+message ChannelTrace {
+  // Channel index (0 = A, 1 = B, …).
+  int32 channel_index = 1;
+
+  // Voltage samples in volts.
+  repeated float samples = 2;
+  // Time axis in seconds, relative to the trigger point (t = 0).
+  repeated float times_seconds = 3;
+
+  // True if the ADC clipped during this capture on this channel.
+  bool overflow = 5;
+}
+
+message GetVoltageRangesRequest {}
+
+message GetVoltageRangesResponse {
+  // Valid ± full-scale voltage ranges in volts.
+  repeated float ranges_volts = 1;
+}
+
+message GetResolutionsRequest {}
+
+message GetResolutionsResponse {
+  // Valid ADC resolutions in bits.
+  repeated int32 resolutions_bits = 1;
+}
+
+message GetTimebasesRequest {}
+
+message GetTimebasesResponse {
+  repeated TimebaseInfo timebases = 1;
+}
+
+message TimebaseInfo {
+  // PicoScope timebase index.
+  int32 timebase_index = 1;
+  // Sample interval in nanoseconds for this timebase.
+  int32 sample_interval_ns = 2;
+}
+
+service PicoscopeService {
+  // Configuration
+  rpc ConfigureChannel(ConfigureChannelRequest) returns (ConfigureChannelResponse);
+  rpc ConfigureTrigger(ConfigureTriggerRequest) returns (ConfigureTriggerResponse);
+  rpc ConfigureTimebase(ConfigureTimebaseRequest) returns (ConfigureTimebaseResponse);
+  rpc ConfigureResolution(ConfigureResolutionRequest) returns (ConfigureResolutionResponse);
+
+  // Acquisition
+  rpc GetTrace(GetTraceRequest) returns (GetTraceResponse);
+  rpc StreamTraces(StreamTracesRequest) returns (stream StreamTracesResponse);
+
+  // Utilities
+  rpc GetVoltageRanges(GetVoltageRangesRequest) returns (GetVoltageRangesResponse);
+  rpc GetResolutions(GetResolutionsRequest) returns (GetResolutionsResponse);
+  rpc GetTimebases(GetTimebasesRequest) returns (GetTimebasesResponse);
+}
