@@ -71,12 +71,19 @@ message ConfigureChannelResponse {}
 message TriggerConfig {
   // 0 for channel A, 1 for channel B, etc.
   int32 channel_index = 1;
+  // Enables or disables the trigger. If unset defaults to true.
+  optional bool enabled = 2;
   // Edge or level condition that fires the trigger.
-  TriggerDirection direction = 2;
-  // Voltage threshold for the trigger condition.
-  float threshold_volts = 3;
-  // Holdoff after a trigger before re-arming, in nanoseconds.
-  int64 holdoff_ns = 4;
+  // If unset defaults to RISING.
+  optional TriggerDirection direction = 3;
+  // Voltage threshold in mV. If unset defaults to 0.
+  optional float threshold_mv = 4;
+  // Delay in samples after the trigger condition is met before starting
+  // capture. If unset defaults to 0.
+  optional int32 delay_samples = 5;
+  // Timeout in microseconds after which capture proceeds even if no trigger
+  // occurs. 0 = wait indefinitely. If unset defaults to 0.
+  optional int32 auto_trigger_us = 6;
 }
 
 message ConfigureTriggerRequest {
@@ -107,27 +114,13 @@ message ConfigureResolutionRequest {
 
 message ConfigureResolutionResponse {}
 
-message GetTraceRequest {}
+message StreamCapturesRequest {}
 
-message GetTraceResponse {
-  // One trace per enabled channel.
-  repeated ChannelTrace traces = 1;
-  // time when the trigger fired.
-  google.protobuf.Timestamp trigger_timestamp = 2;
-}
-
-message StreamTracesRequest {
-  // Maximum number of triggered captures to return, 0 = unlimited.
-  int32 max_captures = 1;
-}
-
-message StreamTracesResponse {
-  // Monotonically increasing capture index (starting at 0).
-  int32 capture_index = 1;
+message StreamCapturesResponse {
   // One entry per enabled channel.
-  repeated ChannelTrace traces = 2;
-  // time when the trigger fired.
-  google.protobuf.Timestamp trigger_timestamp = 3;
+  repeated ChannelTrace traces = 1;
+  // Time when the trigger fired.
+  google.protobuf.Timestamp trigger_timestamp = 2;
 }
 
 // Trace data
@@ -157,6 +150,10 @@ message TimebaseInfo {
   int32 sample_interval_ns = 2;
 }
 
+message ArmCaptureRequest {}
+
+message ArmCaptureResponse {}
+
 service PicoscopeService {
   // Set the coupling, voltage range, and offset for a single channel.
   rpc ConfigureChannel(ConfigureChannelRequest) returns (ConfigureChannelResponse);
@@ -167,12 +164,11 @@ service PicoscopeService {
   // Set the ADC resolution in bits.
   rpc ConfigureResolution(ConfigureResolutionRequest) returns (ConfigureResolutionResponse);
 
-  // Arm the trigger and return a single trace once acquired.
-  rpc GetTrace(GetTraceRequest) returns (GetTraceResponse);
-  // Start a triggered acquisition loop. The server arms the scope, waits
-  // for each trigger, reads out the trace, and streams it back. The stream
-  // continues until the client cancels or max_captures is reached.
-  rpc StreamTraces(StreamTracesRequest) returns (stream StreamTracesResponse);
+  // Arm the trigger and return immediately.
+  rpc ArmCapture(ArmCaptureRequest) returns (ArmCaptureResponse);
+  // Stream triggered captures.
+  // The stream continues until the client cancels.
+  rpc StreamCaptures(StreamCapturesRequest) returns (stream StreamCapturesResponse);
 
   // List available timebases and their sample intervals.
   rpc GetTimebases(GetTimebasesRequest) returns (GetTimebasesResponse);
