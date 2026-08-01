@@ -45,3 +45,7 @@ Run the linter to check for style violations:
 buf lint
 ```
 Lint rules can be configured in `buf.yaml`.
+
+## Relationship to prior work
+
+See [ATTRIBUTION.md](ATTRIBUTION.md).
