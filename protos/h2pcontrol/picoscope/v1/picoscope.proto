@@ -121,6 +121,15 @@ message StreamCapturesResponse {
   repeated ChannelTrace traces = 1;
   // Time when the trigger fired.
   google.protobuf.Timestamp trigger_timestamp = 2;
+  // Index of this capture within the armed batch (0-based).
+  // Always 0 for a normal (non-rapid-block) capture.
+  uint32 capture_index = 3;
+  // Total number of captures in the armed batch.
+  // Always 1 for a normal (non-rapid-block) capture.
+  uint32 num_captures = 4;
+  // Trigger time offset relative to the first capture in the batch, in
+  // nanoseconds. Only meaningful for rapid block captures.
+  int64 trigger_time_offset_ns = 5;
 }
 
 // Trace data
@@ -150,7 +159,11 @@ message TimebaseInfo {
   int32 sample_interval_ns = 2;
 }
 
-message ArmCaptureRequest {}
+message ArmCaptureRequest {
+  // Number of waveforms to capture using rapid block mode.
+  // If unset, 0, or 1, a single normal block capture is armed.
+  optional uint32 num_captures = 1;
+}
 
 message ArmCaptureResponse {}
 
