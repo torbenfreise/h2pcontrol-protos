@@ -114,22 +114,36 @@ message ConfigureResolutionRequest {
 
 message ConfigureResolutionResponse {}
 
-message StreamCapturesRequest {}
+message CaptureRequest {
+  // Number of waveforms to capture using rapid block mode.
+  // If unset, 0, or 1, a single normal block capture is taken.
+  optional uint32 num_captures = 1;
+}
 
-message StreamCapturesResponse {
+// Sent once, before any Capture message, to signal that the trigger is armed.
+message Armed {
+  // Number of captures this acquisition will deliver.
+  uint32 num_captures = 1;
+}
+
+// A single captured waveform set, one per trigger.
+message CaptureData {
   // One entry per enabled channel.
   repeated ChannelTrace traces = 1;
   // Time when the trigger fired.
   google.protobuf.Timestamp trigger_timestamp = 2;
-  // Index of this capture within the armed batch (0-based).
-  // Always 0 for a normal (non-rapid-block) capture.
+  // Index of this capture within the acquisition (0-based).
   uint32 capture_index = 3;
-  // Total number of captures in the armed batch.
-  // Always 1 for a normal (non-rapid-block) capture.
-  uint32 num_captures = 4;
-  // Trigger time offset relative to the first capture in the batch, in
-  // nanoseconds. Only meaningful for rapid block captures.
-  int64 trigger_time_offset_ns = 5;
+  // Trigger time offset relative to the first capture in the acquisition, in
+  // nanoseconds. Only meaningful for rapid block acquisitions.
+  int64 trigger_time_offset_ns = 4;
+}
+
+message CaptureResponse {
+  oneof event {
+    Armed armed = 1;
+    CaptureData capture = 2;
+  }
 }
 
 // Trace data
@@ -159,14 +173,6 @@ message TimebaseInfo {
   int32 sample_interval_ns = 2;
 }
 
-message ArmCaptureRequest {
-  // Number of waveforms to capture using rapid block mode.
-  // If unset, 0, or 1, a single normal block capture is armed.
-  optional uint32 num_captures = 1;
-}
-
-message ArmCaptureResponse {}
-
 service PicoscopeService {
   // Set the coupling, voltage range, and offset for a single channel.
   rpc ConfigureChannel(ConfigureChannelRequest) returns (ConfigureChannelResponse);
@@ -177,11 +183,12 @@ service PicoscopeService {
   // Set the ADC resolution in bits.
   rpc ConfigureResolution(ConfigureResolutionRequest) returns (ConfigureResolutionResponse);
 
-  // Arm the trigger and return immediately.
-  rpc ArmCapture(ArmCaptureRequest) returns (ArmCaptureResponse);
-  // Stream triggered captures.
-  // The stream continues until the client cancels.
-  rpc StreamCaptures(StreamCapturesRequest) returns (stream StreamCapturesResponse);
+  // Run a single acquisition and stream its results.
+  //
+  // The server arms the scope, sends one Armed message, then sends exactly
+  // num_captures Capture messages as the triggers arrive, and closes the
+  // stream. The client must wait for Armed before triggering.
+  rpc Capture(CaptureRequest) returns (stream CaptureResponse);
 
   // List available timebases and their sample intervals.
   rpc GetTimebases(GetTimebasesRequest) returns (GetTimebasesResponse);
