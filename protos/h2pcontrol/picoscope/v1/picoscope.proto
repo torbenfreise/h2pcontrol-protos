@@ -121,10 +121,7 @@ message CaptureRequest {
 }
 
 // Sent once, before any Capture message, to signal that the trigger is armed.
-message Armed {
-  // Number of captures this acquisition will deliver.
-  uint32 num_captures = 1;
-}
+message Armed {}
 
 // A single captured waveform set, one per trigger.
 message CaptureData {
@@ -153,8 +150,6 @@ message ChannelTrace {
 
   // Voltage samples in volts.
   repeated float samples = 2;
-  // Time axis in seconds, relative to the trigger point (t = 0).
-  repeated float times_seconds = 3;
 
   // True if the ADC clipped during this capture on this channel.
   bool overflow = 5;
