@@ -151,9 +151,6 @@ message ChannelTrace {
   // Voltage samples in volts.
   repeated float samples = 2;
 
-  // Time axis in seconds, relative to the trigger point (t = 0).
-  repeated float times_seconds = 3;
-
   // True if the ADC clipped during this capture on this channel.
   bool overflow = 5;
 }
