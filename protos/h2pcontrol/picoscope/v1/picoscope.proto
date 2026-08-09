@@ -2,8 +2,6 @@ syntax = "proto3";
 
 package h2pcontrol.picoscope.v1;
 
-import "google/protobuf/timestamp.proto";
-
 option java_multiple_files = true;
 option java_outer_classname = "PicoscopeServiceProto";
 option java_package = "com.beyerlabs.h2pcontrol.picoscope.v1";
@@ -127,8 +125,6 @@ message Armed {}
 message CaptureData {
   // One entry per enabled channel.
   repeated ChannelTrace traces = 1;
-  // Time when the trigger fired.
-  google.protobuf.Timestamp trigger_timestamp = 2;
   // Index of this capture within the acquisition (0-based).
   uint32 capture_index = 3;
   // Trigger time offset relative to the first capture in the acquisition, in
