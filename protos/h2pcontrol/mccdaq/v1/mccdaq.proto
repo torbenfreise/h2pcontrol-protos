@@ -1,10 +1,6 @@
 syntax = "proto3";
 package h2pcontrol.mccdaq.v1;
 
-// ─────────────────────────────────────────
-// Analog Input
-// ─────────────────────────────────────────
-
 message AnalogSample {
   int32 channel = 1;
   double volts = 2;
@@ -21,10 +17,6 @@ message AnalogStreamRequest {
   double rate_hz = 2;
 }
 
-// ─────────────────────────────────────────
-// Analog Output
-// ─────────────────────────────────────────
-
 message AnalogReadResponse {
   AnalogSample sample = 1;
 }
@@ -39,10 +31,6 @@ message AnalogWriteRequest {
 }
 
 message AnalogWriteResponse {}
-
-// ─────────────────────────────────────────
-// Service
-// ─────────────────────────────────────────
 
 service MccDaqService {
   // Analog input

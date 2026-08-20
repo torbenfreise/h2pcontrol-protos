@@ -73,7 +73,8 @@ message QuadrupoleBenderChannels {
 }
 
 message StoredConfig {
-  int64 timestamp = 1; // Unix timestamp in milliseconds
+  // Unix timestamp in milliseconds.
+  int64 timestamp = 1;
   string name = 2;
   string uuid = 3;
   Config config = 4;

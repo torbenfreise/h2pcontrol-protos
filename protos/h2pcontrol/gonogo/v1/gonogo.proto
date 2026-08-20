@@ -14,5 +14,6 @@ message GetReadyRequest {}
 
 message GetReadyResponse {
   bool ready = 1;
-  string reason = 2; // Optionally give a reason why the service isn't ready.
+  // Optionally gives a reason why the service isn't ready.
+  string reason = 2;
 }
